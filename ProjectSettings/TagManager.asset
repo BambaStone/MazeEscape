@@ -8,6 +8,7 @@ TagManager:
   - Pulse
   - Exit
   - Wall
+  - EnemyBody
   layers:
   - Default
   - TransparentFX
