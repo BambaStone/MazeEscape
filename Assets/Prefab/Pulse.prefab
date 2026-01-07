@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7814152379661629990}
   - component: {fileID: 4488391856741396063}
   - component: {fileID: 5222055075434823515}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Pulse
   m_TagString: Pulse
   m_Icon: {fileID: 0}
@@ -126,3 +126,4 @@ MonoBehaviour:
   LineWidth: 1
   Cam: {fileID: 0}
   Spawner: {fileID: 0}
+  Map: {fileID: 0}

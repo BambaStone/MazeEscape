@@ -51,7 +51,10 @@ public class PulseEffectController : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        Cam.GetComponent<EdgeCommandBuffer>().renderers1.Add(other.gameObject.GetComponent<Renderer>());
+        if (!other.CompareTag("Player") && !other.CompareTag("Objects"))
+        {
+            Cam.GetComponent<EdgeCommandBuffer>().renderers1.Add(other.gameObject.GetComponent<Renderer>());
+        }
         Debug.Log(other.tag);
         if (other.CompareTag("Wall"))
         {
@@ -63,13 +66,33 @@ public class PulseEffectController : MonoBehaviour
         }
         if(other.CompareTag("Enemy"))
         {
+            
             if (!Map.Enemy.Contains(other.transform.parent.gameObject))
             {
+                other.transform.parent.gameObject.GetComponent<Outline>().enabled=true;
                 Map.Enemy.Add(other.transform.parent.gameObject);
                 Map.AddEnemy();
             }
         }
-        
+        if (other.CompareTag("Objects"))
+        {
+            if (!Map.Objects.Contains(other.gameObject))
+            {
+                other.GetComponent<Outline>().enabled = true;
+                Map.Objects.Add(other.gameObject);
+                Map.AddObjects();
+            }
+        }
+        if(other.CompareTag("Item"))
+        {
+            if (!Map.Item.Contains(other.gameObject))
+            {
+                other.GetComponent<Outline>().enabled = true;
+                Map.Item.Add(other.gameObject);
+                Map.AddItem();
+            }
+        }
+
     }
 
     

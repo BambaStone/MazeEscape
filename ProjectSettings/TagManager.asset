@@ -9,15 +9,19 @@ TagManager:
   - Exit
   - Wall
   - EnemyBody
+  - EnemyPos
+  - Lever
+  - Objects
+  - Item
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Pulse
   - Water
   - UI
-  - 
-  - 
+  - Ploor
+  - NoRay
   - 
   - 
   - 

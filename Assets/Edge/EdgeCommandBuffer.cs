@@ -11,7 +11,8 @@ public class EdgeCommandBuffer : MonoBehaviour
     public Shader maskShader;
     public bool isShowing = true;
     public List<Renderer> renderers1;
-    public float LinePower=1f;
+    public List<Renderer> Player;
+    public float LinePower=0f;
     private CommandBuffer _cb;
     private Camera _cam;
 
@@ -27,6 +28,8 @@ public class EdgeCommandBuffer : MonoBehaviour
         }
         _cam.RemoveCommandBuffer(CameraEvent.AfterForwardOpaque, _cb);
         _cam.AddCommandBuffer(CameraEvent.AfterForwardOpaque, _cb);
+        edgeMaterial.SetColor("_EdgeColor", new Color(0, 0, 0, 0));
+        LinePower = 0;
     }
 
     void OnDisable()
@@ -58,15 +61,20 @@ public class EdgeCommandBuffer : MonoBehaviour
         _cb.ClearRenderTarget(true, true, Color.clear);
         _cb.SetViewProjectionMatrices(_cam.worldToCameraMatrix, _cam.projectionMatrix);
 
+        if (Player != null)
+        {
+            for (int i = 0; i < Player.Count; i++)
+            {
+                _cb.DrawRenderer(Player[i], new Material(maskShader));
+
+            }
+        }
         if (renderers1 != null)
         {
             for (int i = 0; i < renderers1.Count; i++)
             {
                 _cb.DrawRenderer(renderers1[i], new Material(maskShader));
-                if(renderers1[i].gameObject.CompareTag("Enemy"))
-                {
-                    renderers1[i].gameObject.GetComponent<Outline>().OutlineColor = new Color(1,1,1,LinePower);
-                }
+
             }
         }
         
