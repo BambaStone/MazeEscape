@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -15,6 +16,11 @@ public class PlayerController : MonoBehaviour
     public EffectSpawner HitEffectSpawner;
     public LayerMask layerToIgnore;
     public GameObject Gun;
+
+    public bool GunOn = false;
+    public int GunBullet = 10;
+    public int GunBulletNow = 10;
+    public TMP_Text GunBulletUI;
 
     public float PulseBattery = 8f;
     public float PulseBatteryNow = 8f;
@@ -40,26 +46,55 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         Move();
-        
-        if(Input.GetMouseButtonDown(0))
-        {
-            ShotEffectSpawner.EffectActive();
+        PulseOn();
+        Shot();
+    }
 
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            int mask = ~layerToIgnore;
-            RaycastHit hit;
-            if(Physics.Raycast(ray,out hit, 100f, mask))
+    void Shot()
+    {
+        if (GunOn && 0 < GunBulletNow)
+        {
+            if (Input.GetMouseButtonDown(0))
             {
-                Debug.Log("Hit Object: " + hit.collider.name);
-                HitEffectSpawner.TargetEffectActive(hit.point);
-                if(hit.collider.CompareTag("Enemy"))
+                GunBulletNow--;
+                GunBulletUI.text = GunBulletNow + "";
+                ShotEffectSpawner.EffectActive();
+
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                int mask = ~layerToIgnore;
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit, 100f, mask))
                 {
-                    hit.collider.transform.parent.gameObject.GetComponent<Enemy>().HitGun();
+                    Debug.Log("Hit Object: " + hit.collider.name);
+                    HitEffectSpawner.TargetEffectActive(hit.point);
+                    if (hit.collider.CompareTag("Enemy"))
+                    {
+                        hit.collider.transform.parent.gameObject.GetComponent<Enemy>().HitGun();
+                    }
                 }
             }
         }
     }
-
+    void PulseOn()
+    {
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            if (CoolTimeNow <= 0 && 0 < PulseBatteryNow)
+            {
+                PulseSpawners.PulseActive(Head.transform.position);
+                CoolTimeNow = CoolTime;
+                PulseBatteryNow--;
+                if (0 < PulseBatteryNow)
+                {
+                    PulseBatteryUI.fillAmount = PulseBatteryNow / PulseBattery;
+                }
+                else
+                {
+                    PulseBatteryUI.fillAmount = 0;
+                }
+            }
+        }
+    }
     void Move()
     {
         float mouseX = Input.GetAxis("Mouse X") * MouseSensitivity * Time.deltaTime;
@@ -74,7 +109,8 @@ public class PlayerController : MonoBehaviour
             float v = Input.GetAxis("Vertical");
 
             Vector3 movement = new Vector3(h, 0, v);
-            move = transform.TransformDirection(movement) * Time.deltaTime * 10;
+            move = new Vector3(h, 0, v);
+            //move = transform.TransformDirection(movement) * Time.deltaTime * 10;
 
         }
         else
@@ -91,23 +127,7 @@ public class PlayerController : MonoBehaviour
         {
             _run = false;
         }
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            if (CoolTimeNow <= 0 && 0<PulseBatteryNow)
-            {
-                PulseSpawners.PulseActive(Head.transform.position);
-                CoolTimeNow = CoolTime;
-                PulseBatteryNow--;
-                if (0 < PulseBatteryNow)
-                {
-                    PulseBatteryUI.fillAmount = PulseBatteryNow / PulseBattery;
-                }
-                else
-                {
-                    PulseBatteryUI.fillAmount = 0;
-                }
-            }
-        }
+        
     }
 
 
@@ -116,11 +136,13 @@ private void FixedUpdate()
         //transform.Translate(move);
         if (_run)
         {
-            _rigidbody.velocity = move * MoveSpeed*2;
+            transform.Translate(move * MoveSpeed * 2 * Time.deltaTime);
+            //  _rigidbody.velocity = move * MoveSpeed*2*Time.deltaTime;
         }
         else
         {
-            _rigidbody.velocity = move * MoveSpeed;
+            transform.Translate(move * MoveSpeed * Time.deltaTime);
+            // _rigidbody.velocity = move * MoveSpeed * Time.deltaTime;
         }
         //transform.position = transform.position + move;
 

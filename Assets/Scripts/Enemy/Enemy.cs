@@ -7,15 +7,48 @@ public class Enemy : MonoBehaviour
 
     public int HP = 3;
     public GameObject Player;
-    private bool _goTarget = false;
+    public int PatternType = 0;
+    public Outline outlines;
 
-    // Update is called once per frame
-    void Update()
+    public bool _rushOn=false;
+    public bool _triggerPulse = false;
+
+    private void Start()
     {
-        if(_goTarget)
+        outlines = gameObject.GetComponent<Outline>();
+    }
+
+    private void FixedUpdate()
+    {
+        
+        switch(PatternType)
         {
-            transform.LookAt(Player.transform);
-            transform.Translate(transform.forward*-1*Time.deltaTime*3);
+            case 0:
+                if(_triggerPulse)
+                {
+                    transform.LookAt(Player.transform);
+                    transform.Translate(Vector3.forward * Time.deltaTime*3);
+                }
+                break;
+            case 1:
+                if (!_triggerPulse)
+                {
+                    transform.LookAt(Player.transform);
+                    transform.Translate(Vector3.forward * Time.deltaTime);
+                }
+                break;
+            case 2:
+                if(_triggerPulse)
+                {
+                    transform.LookAt(Player.transform);
+                    _triggerPulse = false;
+                    StartCoroutine(RushOn());
+                }
+                if(_rushOn)
+                {
+                    transform.Translate(Vector3.forward * Time.deltaTime * 10);
+                }
+                break;
         }
     }
 
@@ -23,29 +56,44 @@ public class Enemy : MonoBehaviour
     {
         if(other.CompareTag("Pulse"))
         {
-            StartCoroutine(GoTarget());
+            _triggerPulse = true;
         }
     }
+
 
     public void HitGun()
     {
+        
         HP--;
         if(HP <=0)
         {
-            gameObject.SetActive(false);
+            switch(PatternType)
+            {
+                case 0:
+                    gameObject.SetActive(false);
+                    break;
+                case 1:
+                    HP = 2;
+                    transform.Translate(Vector3.forward * 50*-1);
+                    break;
+                case 2:
+                    gameObject.SetActive(false);
+                    break;
+            }
+            
         }
     }
 
-    IEnumerator GoTarget()
+    IEnumerator RushOn()
     {
-        yield return new WaitForSeconds(0.5f);
-        _goTarget = true;
-        StartCoroutine(Stop());
+        yield return new WaitForSeconds(1f);
+        transform.LookAt(Player.transform);
+        _rushOn = true;
+        StartCoroutine(RushOff());
     }
-    IEnumerator Stop()
+    IEnumerator RushOff()
     {
-        yield return new WaitForSeconds(5f);
-        _goTarget = false;
+        yield return new WaitForSeconds(2f);
+        _rushOn = false;
     }
-
 }

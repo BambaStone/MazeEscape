@@ -17,8 +17,12 @@ public class Battery : MonoBehaviour
             if(Input.GetKeyDown(KeyCode.F))
             {
                 F.text = "";
-                PC.PulseBatteryNow = PC.PulseBattery;
-                PC.PulseBatteryUI.fillAmount = 1;
+                PC.PulseBatteryNow = PC.PulseBatteryNow+2;
+                if(PC.PulseBattery<PC.PulseBatteryNow)
+                {
+                    PC.PulseBatteryNow = PC.PulseBattery;
+                }
+                PC.PulseBatteryUI.fillAmount = PC.PulseBatteryNow / PC.PulseBattery;
                 gameObject.SetActive(false);
             }
         }

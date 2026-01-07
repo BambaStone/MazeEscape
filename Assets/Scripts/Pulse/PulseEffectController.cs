@@ -43,6 +43,10 @@ public class PulseEffectController : MonoBehaviour
             if (!Spawner.PulseOnChack())
             {
                 Cam.GetComponent<EdgeCommandBuffer>().renderers1.Clear();
+                for(int i=0;i<Map.Enemy.Count;i++)
+                {
+                    Map.Enemy[i].GetComponent<Enemy>()._triggerPulse = false;
+                }
                 Map.Enemy.Clear();
                 Map.Enemy_MiniMap.Clear();
             }
